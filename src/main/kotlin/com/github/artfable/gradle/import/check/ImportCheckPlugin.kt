@@ -16,6 +16,10 @@ class ImportCheckPlugin: Plugin<Project> {
         val config = project.extensions.create("importCheck", ImportCheckExtensions::class.java)
 
         project.tasks.create("importCheck") { task ->
+            if (project.tasks.findByName("compileJava") != null) {
+                task.shouldRunAfter("compileJava")
+            }
+
             task.doFirst {
                 var violated = false
 
@@ -44,10 +48,12 @@ class ImportCheckPlugin: Plugin<Project> {
 
                         if (violatedImports.isNotEmpty()) {
                             violated = true
-                            println("${codeTree.packageName}.${(codeTree.typeDecls[0] as JCTree.JCClassDecl).name}".color(Colour.RED))
+                            println("${codeTree.packageName}.${(codeTree.typeDecls[0] as JCTree.JCClassDecl).name}".color(if (group.warning) Colour.YELLOW else Colour.RED))
                             violatedImports.forEach(::println)
                         }
                     }
+
+                    violated = violated && !group.warning
                 }
 
                 if (violated && config.failBuild) {
@@ -71,6 +77,7 @@ open class ImportCheckExtensions {
 }
 
 open class ImportCheckGroup {
+    var warning = false
     var source: String? = null
     var patterns: Set<String> = HashSet()
 }

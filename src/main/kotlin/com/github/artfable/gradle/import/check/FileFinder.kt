@@ -15,7 +15,7 @@ class FileFinder(val rootPath: String) {
     private fun parse(file: File) {
         if (file.isDirectory) {
             file.listFiles()?.forEach(::parse)
-        } else {
+        } else if (file.extension == "java") {
             files.add(file)
         }
     }

@@ -1,5 +1,5 @@
 # Gradle Import Check Plugin
-(version: 0.0.1)
+[ ![bintray](https://api.bintray.com/packages/artfable/gradle-plugins/gradle-import-check-plugin/images/download.svg?version=0.0.2) ](https://bintray.com/artfable/gradle-plugins/gradle-import-check-plugin/0.0.2/link)
 
 ## Overview
 Allow to find classes with specific imports 
@@ -41,6 +41,7 @@ It'll add a task `importCheck`
 importCheck {
     // failBuild = true // default
     group {
+        // warning = false // default
         source = "$projectDir/src/test/java"
         patterns = ["org\\.junit\\.(?!jupiter).*"]
     }
@@ -56,6 +57,7 @@ or
 configure<ImportCheckExtension> {
     // failBuild = true // default
     group(delegateClosureOf<ImportCheckGroup> {
+        // warning = false // default
         source = "$projectDir/src/test/java"
         patterns = setOf("org\\.junit\\.(?!jupiter).*")
     })
@@ -64,4 +66,6 @@ configure<ImportCheckExtension> {
     })
 }
 ```
+
+Put `warning = true` to put check for that group as a warning and not fail the build for that group
 

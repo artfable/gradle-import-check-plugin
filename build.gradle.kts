@@ -1,7 +1,7 @@
 import com.jfrog.bintray.gradle.BintrayExtension
 
 group = "com.github.artfable.gradle"
-version = "0.0.1"
+version = "0.0.2"
 
 buildscript {
     val bintray_version = "1.8.4"

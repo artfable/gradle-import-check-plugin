@@ -1,4 +1,4 @@
-package com.github.artfable.gradle.import.check
+package com.artfable.gradle.import.check
 
 import java.io.File
 

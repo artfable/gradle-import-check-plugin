@@ -1,4 +1,4 @@
-package com.github.artfable.gradle.import.check
+package com.artfable.gradle.import.check
 
 enum class Colour(val code: String) {
     RESET("\u001b[0m"),

@@ -1,37 +1,25 @@
 # Gradle Import Check Plugin
-[ ![bintray](https://api.bintray.com/packages/artfable/gradle-plugins/gradle-import-check-plugin/images/download.svg?version=0.0.2) ](https://bintray.com/artfable/gradle-plugins/gradle-import-check-plugin/0.0.2/link)
+[ ![artifactory](https://img.shields.io/badge/Artifactory-v0.0.3-green) ](https://artfable.jfrog.io/ui/packages/gav:%2F%2Fcom.artfable.gradle:gradle-import-check-plugin)
 
 ## Overview
-Allow to find classes with specific imports 
+Allows finding classes with specific imports 
  
 
 ## Install
-```groovy
-buildscript {
-    repositories {
-        jcenter()
-    }
-    dependencies {
-        classpath "com.github.artfable.gradle:gradle-import-check-plugin:0.0.1"
-    }
-}
-
-apply plugin: 'artfable.import.check'
-```
-
-or
-
 ```kotlin
 buildscript {
     repositories {
-        jcenter()
+        maven(url = "https://artfable.jfrog.io/artifactory/default-maven-local")
     }
     dependencies {
-        classpath("com.github.artfable.gradle:gradle-import-check-plugin:0.0.1")
+        classpath("com.artfable.gradle:gradle-import-check-plugin:0.0.3")
     }
 }
+
 apply(plugin = "artfable.import.check")
 ```
+
+For use in `plugins {}` see [Gradle resolution strategy](https://docs.gradle.org/current/userguide/custom_plugins.html#note_for_plugins_published_without_java_gradle_plugin) 
 
 It'll add a task `importCheck`
 

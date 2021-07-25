@@ -1,4 +1,5 @@
-package com.github.artfable.gradle.import.check
+@file:Suppress("JAVA_MODULE_DOES_NOT_EXPORT_PACKAGE")
+package com.artfable.gradle.import.check
 
 import com.sun.tools.javac.api.JavacTool
 import com.sun.tools.javac.file.JavacFileManager
@@ -32,7 +33,7 @@ class ImportCheckPlugin: Plugin<Project> {
                     val javacFileManager = JavacFileManager(context, true, Charset.forName("UTF-8"))
                     val javacTool = JavacTool.create()
 
-                    val regexs = group.patterns.map(::Regex)
+                    val regex = group.patterns.map(::Regex)
 
                     val javacTask = javacTool
                         .getTask(null, javacFileManager, null, null, null, javacFileManager.getJavaFileObjects(*FileFinder(group.source!!)
@@ -41,7 +42,7 @@ class ImportCheckPlugin: Plugin<Project> {
                     javacTask.parse().forEach { codeTree ->
                         val violatedImports = mutableListOf<String>()
                         codeTree.imports.forEach { imp ->
-                            if (regexs.any(imp.qualifiedIdentifier.toString()::matches)) {
+                            if (regex.any(imp.qualifiedIdentifier.toString()::matches)) {
                                 violatedImports.add(imp.toString())
                             }
                         }

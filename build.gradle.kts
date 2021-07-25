@@ -1,57 +1,48 @@
-import com.jfrog.bintray.gradle.BintrayExtension
-
-group = "com.github.artfable.gradle"
-version = "0.0.2"
+group = "com.artfable.gradle"
+version = "0.0.3"
 
 buildscript {
-    val bintray_version = "1.8.4"
-    val artifact_plugin_version = "0.0.1"
-
     repositories {
-        jcenter()
         mavenCentral()
-        maven(url = "http://dl.bintray.com/artfable/gradle-plugins")
-    }
-
-    dependencies {
-        classpath("com.jfrog.bintray.gradle:gradle-bintray-plugin:$bintray_version")
-        classpath("com.github.artfable.gradle:gradle-artifact-plugin:$artifact_plugin_version")
     }
 }
 
 plugins {
     java
-    kotlin("jvm") version "1.3.61"
+    kotlin("jvm") version "1.5.21"
+    id("com.jfrog.artifactory") version "4.24.14"
+    `maven-publish`
+    id("artfable.artifact") version "0.0.2"
 }
 
-apply(plugin = "maven-publish")
-apply(plugin = "com.jfrog.bintray")
-apply(plugin = "artfable.artifact")
-
 repositories {
-    jcenter()
     mavenCentral()
 }
 
 dependencies {
-    // FIXME: it part of jdk, should be there
-    implementation(files("${System.getProperty("java.home")}/../lib/tools.jar"))
-
     implementation(kotlin("stdlib-jdk8"))
+    implementation(kotlin("reflect"))
     implementation(gradleApi())
     implementation(localGroovy())
 }
 
 tasks {
     compileKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "16"
     }
     compileTestKotlin {
-        kotlinOptions.jvmTarget = "1.8"
+        kotlinOptions.jvmTarget = "16"
     }
 }
 
-configure<PublishingExtension> {
+val user = if (project.hasProperty("artifactoryUser")) {
+    project.ext["artifactoryUser"]
+} else System.getenv("ARTIFACTORY_USER")
+val key = if (project.hasProperty("artifactoryKey")) {
+    project.ext["artifactoryKey"]
+} else System.getenv("ARTIFACTORY_KEY")
+
+publishing {
     publications {
         create<MavenPublication>("mavenJava") {
             from(components["java"])
@@ -79,22 +70,20 @@ configure<PublishingExtension> {
     }
 }
 
-configure<BintrayExtension> {
-    user = if (project.hasProperty("bintrayUser")) {
-        project.ext["bintrayUser"] as String
-    } else System.getenv("BINTRAY_USER")
-    key = if (project.hasProperty("bintrayKey")) {
-        project.ext["bintrayKey"] as String
-    } else System.getenv("BINTRAY_KEY")
-    setPublications("mavenJava")
-    pkg(delegateClosureOf<BintrayExtension.PackageConfig> {
-        repo = "gradle-plugins"
-        name = "gradle-import-check-plugin"
-        setLicenses("MIT")
-        vcsUrl = "https://github.com/artfable/gradle-import-check-plugin.git"
-        version(delegateClosureOf<BintrayExtension.VersionConfig> {
-            attributes =
-                mapOf(Pair("gradle-plugin", "artfable.import.check:com.github.artfable.gradle:gradle-import-check-plugin"))
-        })
-    })
+artifactory {
+    setContextUrl("https://artfable.jfrog.io/artifactory/")
+    publish {
+        repository {
+            setRepoKey("default-maven-local")
+            setUsername(user)
+            setPassword(key)
+        }
+        defaults {
+            publications ("mavenJava")
+
+            setPublishArtifacts(true)
+            setPublishPom(true)
+            setPublishIvy(false)
+        }
+    }
 }

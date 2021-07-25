@@ -54,7 +54,7 @@ publishing {
                 licenses {
                     license {
                         name.set("MIT")
-                        url.set("https://github.com/artfable/gradle-import-check-plugin/master/LICENSE")
+                        url.set("https://raw.githubusercontent.com/artfable/gradle-import-check-plugin/master/LICENSE")
                         distribution.set("repo")
                     }
                 }

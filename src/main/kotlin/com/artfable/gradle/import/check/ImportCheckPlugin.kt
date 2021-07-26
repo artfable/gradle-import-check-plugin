@@ -5,7 +5,7 @@ import com.sun.tools.javac.api.JavacTool
 import com.sun.tools.javac.file.JavacFileManager
 import com.sun.tools.javac.tree.JCTree
 import com.sun.tools.javac.util.Context
-import groovy.lang.Closure
+import org.gradle.api.Action
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import java.nio.charset.Charset
@@ -16,12 +16,12 @@ class ImportCheckPlugin: Plugin<Project> {
     override fun apply(project: Project) {
         val config = project.extensions.create("importCheck", ImportCheckExtensions::class.java)
 
-        project.tasks.create("importCheck") { task ->
+        project.tasks.create("importCheck") {
             if (project.tasks.findByName("compileJava") != null) {
-                task.shouldRunAfter("compileJava")
+                this.shouldRunAfter("compileJava")
             }
 
-            task.doFirst {
+            this.doFirst {
                 var violated = false
 
                 config.groups.forEach { group ->
@@ -37,7 +37,7 @@ class ImportCheckPlugin: Plugin<Project> {
 
                     val javacTask = javacTool
                         .getTask(null, javacFileManager, null, null, null, javacFileManager.getJavaFileObjects(*FileFinder(group.source!!)
-                        .findFiles()))
+                            .findFiles()))
 
                     javacTask.parse().forEach { codeTree ->
                         val violatedImports = mutableListOf<String>()
@@ -69,11 +69,8 @@ open class ImportCheckExtensions {
     val groups: MutableList<ImportCheckGroup> = LinkedList()
     var failBuild = true
 
-    fun group(closure: Closure<Unit>) {
-        val group = ImportCheckGroup()
-        closure.delegate = group
-        closure.call()
-        groups.add(group)
+    fun group(action: Action<ImportCheckGroup>) {
+        groups.add(ImportCheckGroup().apply(action::execute))
     }
 }
 
